@@ -1,0 +1,29 @@
+# .github/workflows/deploy.yml
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches:
+      - master  # Triggers the workflow when code is pushed to the 'master' branch
+
+jobs:
+  deploy:
+    name: Deploy Pod to Kubernetes
+    runs-on: self-hosted  # Using a self-hosted Kubernetes runner
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3  # Check out the repository code
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3  # Set up kubectl for interacting with Kubernetes
+        with:
+          version: 'latest'
+
+      - name: Create Kubernetes Pod
+        run: |
+          kubectl apply -f pod.yaml
+
+      - name: Verify Pod is running
+        run: |
+          kubectl get pods
