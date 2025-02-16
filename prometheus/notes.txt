@@ -1,0 +1,51 @@
+refere moniitoring docker-compsoeyaml file for better clarity
+
+/your-project
+├── docker-compose.yml
+├── loki/
+│   └── loki.yml
+├── promtail/
+│   └── promtail.yml
+└── app/
+    └── logs/
+        └── node-app.log    # Logs of the Node.js app
+
+/your-project
+├── docker-compose.yml
+├── prometheus/
+│   └── prometheus.yml
+└── app/
+    ├── Dockerfile
+    └── server.js  # (or your Node.js app files)
+
+
+Loki and Promtail Interaction:
+Loki is the log aggregation system. It stores logs collected from Promtail in a time-series database.
+Promtail is a log collector that runs on your host machine. It monitors specified log files, reads new logs, and forwards them to Loki.
+
+
+/loki/loki.yml: Loki's configuration file.
+/promtail/promtail.yml: Promtail's configuration file.
+/app/logs/: The directory where logs from the Node.js app or other services are stored. Promtail will read logs from this directory.
+
+
+scrape_configs:: Defines the log files that Promtail should watch.
+__path__: Specifies the location of the log file on the host (e.g., /app/logs/node-app.log).
+
+In the above setup, Promtail does not directly scrape logs from the Node.js container. Instead, it scrapes logs from the host machine. However, since the Node.js container writes logs to a directory on the host that is shared with the Promtail container (using Docker volumes), Promtail can access those logs as if they were on the host itself.
+
+
+Promtail → Loki:
+
+Promtail is responsible for collecting logs from various sources (like log files on the host machine) and pushing them to Loki.
+Promtail scrapes the logs and then sends them to Loki using HTTP requests. It forwards the logs with attached labels (like job name, container name, etc.) to make it easier to query them in Loki later
+
+
+
+Example Metrics Collected from Prometheus Itself:
+Some common metrics that Prometheus scrapes about itself include:
+
+prometheus_engine_query_duration_seconds: Time taken to execute queries.
+prometheus_local_storage_ingested_samples_total: Total number of samples ingested.
+prometheus_target_interval_length_seconds: Scraping interval lengths.
+prometheus_notifications_alerts_sent_total: Total number of alerts sent.
